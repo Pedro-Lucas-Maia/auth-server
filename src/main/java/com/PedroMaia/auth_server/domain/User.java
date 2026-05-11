@@ -1,6 +1,7 @@
 package com.PedroMaia.auth_server.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,11 +12,13 @@ public class User {
     private String name;
     private String email;
     private String password;
+
+    @Column("role_id")
     private Role role;
-    private boolean isLocked;
+    private boolean locked;
     private boolean enabled;
     private LocalDateTime createdAt;
-    private LocalDateTime upDateAt;
+    private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;
 
     public User() {}
@@ -61,11 +64,11 @@ public class User {
     }
 
     public boolean isLocked() {
-        return isLocked;
+        return locked;
     }
 
-    public void setLocked(boolean locked) {
-        isLocked = locked;
+    public void setLocked(boolean isLocked) {
+        locked = isLocked;
     }
 
     public boolean isEnabled() {
@@ -83,12 +86,12 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpDateAt() {
-        return upDateAt;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpDateAt(LocalDateTime upDateAt) {
-        this.upDateAt = upDateAt;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public LocalDateTime getLastLoginAt() {
