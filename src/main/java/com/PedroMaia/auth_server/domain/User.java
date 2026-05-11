@@ -1,11 +1,14 @@
 package com.PedroMaia.auth_server.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Table("users")
 public class User {
     @Id
     private UUID id;
@@ -14,7 +17,12 @@ public class User {
     private String password;
 
     @Column("role_id")
-    private Role role;
+    private UUID roleId;
+
+    @ReadOnlyProperty
+    @Column("role_name")
+    private String roleName;
+
     private boolean locked;
     private boolean enabled;
     private LocalDateTime createdAt;
@@ -55,12 +63,20 @@ public class User {
         this.password = password;
     }
 
-    public Role getRole() {
-        return role;
+    public UUID getRoleId() {
+        return roleId;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRoleId(UUID roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     public boolean isLocked() {

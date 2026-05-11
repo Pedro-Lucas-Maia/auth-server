@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/index.html").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenResolver(bearerTokenResolver)

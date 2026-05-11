@@ -14,10 +14,9 @@ public interface UserRepository extends ListCrudRepository<User, UUID> {
 
     @Query("""
         SELECT u.*,
-               r.id AS role_id,
                r.name AS role_name
-        FROM "user" u
-        JOIN "role" r ON u.role_id = r.id
+        FROM users u
+        JOIN roles r ON u.role_id = r.id
         WHERE u.email = :email
     """)
     Optional<User> findByEmail(@Param("email") String email);
