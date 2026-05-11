@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -35,6 +37,10 @@ public class UserService {
         newUser.setEmail(registerRequestDTO.email());
         newUser.setPassword(encodedPassword);
         newUser.setRole(roleRepository.findByName("ROLE_USER").orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Default role not found")));
+        newUser.setLocked(false);
+        newUser.setEnabled(true);
+        newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setUpdatedAt(LocalDateTime.now());
         userRepository.save(newUser);
 
         return new UserResponseDTO(newUser.getName(), newUser.getEmail(), newUser.getRole().getName());
@@ -42,7 +48,7 @@ public class UserService {
 
     public UserResponseDTO login(LoginRequestDTO loginRequestDTO) {
         User user = userRepository.findByEmail(loginRequestDTO.email()).orElse(null);
-        if (user == null || !isLoginCorrect(user, loginRequestDTO.password())) {
+        if (user == null || !isLoginCorrect(user, loginRequestDTO.password()) || user.isLocked()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
         return new UserResponseDTO(user.getName(), user.getEmail(), user.getRole().getName());
