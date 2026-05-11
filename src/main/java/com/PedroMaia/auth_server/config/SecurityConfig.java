@@ -32,8 +32,8 @@ public class SecurityConfig {
     protected SecurityFilterChain myFilterChain(HttpSecurity http, BearerTokenResolver bearerTokenResolver) throws Exception {
         HttpSecurity httpSecurity = http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenResolver(bearerTokenResolver)
