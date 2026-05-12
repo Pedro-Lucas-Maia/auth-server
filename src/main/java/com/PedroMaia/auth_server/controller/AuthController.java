@@ -5,6 +5,7 @@ import com.PedroMaia.auth_server.dto.LoginRequestDTO;
 import com.PedroMaia.auth_server.dto.RegisterRequestDTO;
 import com.PedroMaia.auth_server.dto.UserResponseDTO;
 import com.PedroMaia.auth_server.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<UserResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         AuthResponseDTO authResponseDTO = authService.login(loginRequestDTO);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authResponseDTO.cookie())
@@ -37,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
         AuthResponseDTO authResponseDTO = authService.register(registerRequestDTO);
 
         return  ResponseEntity.ok()
