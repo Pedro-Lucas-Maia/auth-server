@@ -28,6 +28,8 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;
+    private int failedLoginAttempts;
+    private LocalDateTime lockoutMoment;
 
     public User() {}
 
@@ -116,5 +118,21 @@ public class User {
 
     public void setLastLoginAt(LocalDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
+    }
+
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+
+    public LocalDateTime getLockoutMoment() {
+        return lockoutMoment;
+    }
+
+    public void setLockoutMoment(LocalDateTime lockoutMoment) {
+        this.lockoutMoment = lockoutMoment;
     }
 }

@@ -51,11 +51,32 @@ public class UserService {
         return new UserResponseDTO(newUser.getName(), newUser.getEmail(), role.getName());
     }
 
+    @Transactional
     public UserResponseDTO login(LoginRequestDTO loginRequestDTO) {
         User user = userRepository.findByEmail(loginRequestDTO.email()).orElse(null);
-        if (user == null || !isLoginCorrect(user, loginRequestDTO.password()) || user.isLocked()) {
+        if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
+        if(user.isLocked()) {
+            if(user.getLockoutMoment() != null && user.getLockoutMoment().plusMinutes(15).isBefore(LocalDateTime.now())) {
+                user.setLocked(false);
+                user.setFailedLoginAttempts(0);
+                user.setLockoutMoment(null);
+                userRepository.save(user);
+            } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account is locked");
+        }
+    }
+        if(!isLoginCorrect(user, loginRequestDTO.password())) {
+            user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+            if(user.getFailedLoginAttempts() >= 5) {
+                user.setLocked(true);
+                user.setLockoutMoment(LocalDateTime.now());
+            }
+            userRepository.save(user);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        }
+        user.setFailedLoginAttempts(0);
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
         return new UserResponseDTO(user.getName(), user.getEmail(), user.getRoleName());
