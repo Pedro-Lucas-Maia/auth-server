@@ -16,39 +16,11 @@ import java.time.LocalDateTime;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository,  PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
-    public UserResponseDTO register(RegisterRequestDTO registerRequestDTO) {
-        if (userRepository.existsByEmail(registerRequestDTO.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
-        }
-        
-        var role = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Default role not found"));
-        
-        String encodedPassword = passwordEncoder.encode(registerRequestDTO.password());
-        User newUser = new User();
-        newUser.setName(registerRequestDTO.name());
-        newUser.setEmail(registerRequestDTO.email());
-        newUser.setPassword(encodedPassword);
-        newUser.setRoleId(role.getId());
-        newUser.setLocked(false);
-        newUser.setEnabled(true);
-        newUser.setCreatedAt(LocalDateTime.now());
-        newUser.setUpdatedAt(LocalDateTime.now());
-        newUser.setLastLoginAt(LocalDateTime.now());
-        userRepository.save(newUser);
-
-        return new UserResponseDTO(newUser.getName(), newUser.getEmail(), role.getName());
-    }
 
     public UserResponseDTO me(String email) {
         User user = userRepository.findByEmail(email).orElse(null);

@@ -11,11 +11,13 @@ public class AuthService {
     private final UserService userService;
     private final LoginService loginService;
     private final CookieService cookieService;
+    private final RegisterService registerService;
 
-    public AuthService(UserService userService, LoginService loginService, CookieService cookieService) {
+    public AuthService(UserService userService, LoginService loginService, CookieService cookieService, RegisterService registerService) {
         this.userService = userService;
         this.loginService = loginService;
         this.cookieService = cookieService;
+        this.registerService = registerService;
     }
 
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -28,7 +30,7 @@ public class AuthService {
     }
 
     public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO) {
-        UserResponseDTO user = userService.register(registerRequestDTO);
+        UserResponseDTO user = registerService.register(registerRequestDTO);
         return new AuthResponseDTO(user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
     }
 
