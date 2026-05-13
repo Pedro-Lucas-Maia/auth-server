@@ -1,4 +1,6 @@
 package com.PedroMaia.auth_server.dto;
 
-public record UserResponseDTO(String name, String email, String role) {
+import java.util.UUID;
+
+public record UserResponseDTO(UUID Id, String name, String email, String role) {
 }

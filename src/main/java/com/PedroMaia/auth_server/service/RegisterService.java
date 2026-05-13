@@ -34,7 +34,7 @@ public class RegisterService {
 
         User user = saveUserToDb(registerRequestDTO, role);
 
-        return new UserResponseDTO(user.getName(), user.getEmail(), user.getRoleName());
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRoleName());
     }
 
     private void checkEmailUniqueness(String email) {

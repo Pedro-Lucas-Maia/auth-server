@@ -21,6 +21,6 @@ public class UserService {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        return new UserResponseDTO(user.getName(), user.getEmail(), user.getRoleName());
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRoleName());
     }
 }

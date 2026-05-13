@@ -22,7 +22,7 @@ public class AuthService {
 
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
         UserResponseDTO user = loginService.login(loginRequestDTO);
-        return new AuthResponseDTO(user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
+        return new AuthResponseDTO(user.Id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
     }
 
     public String getCleanCookie() {
@@ -31,11 +31,11 @@ public class AuthService {
 
     public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO) {
         UserResponseDTO user = registerService.register(registerRequestDTO);
-        return new AuthResponseDTO(user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
+        return new AuthResponseDTO(user.Id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
     }
 
     public AuthResponseDTO me(String email) {
         UserResponseDTO user = userService.me(email);
-        return new AuthResponseDTO(user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
+        return new AuthResponseDTO(user.Id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
     }
 }

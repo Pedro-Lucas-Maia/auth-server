@@ -25,7 +25,7 @@ public class LoginService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional(noRollbackFor = ResponseStatusException.class) // don't rollback on ResponseStatusException to allow failed login attempts to be saved
+    @Transactional(noRollbackFor = ResponseStatusException.class) // don't roll back on ResponseStatusException to allow failed login attempts to be saved
     public UserResponseDTO login(LoginRequestDTO loginRequestDTO) {
         User user = fetchUserOrThrow(loginRequestDTO.email());
 
@@ -74,6 +74,6 @@ public class LoginService {
         user.setFailedLoginAttempts(0);
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
-        return new UserResponseDTO(user.getName(), user.getEmail(), user.getRoleName());
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRoleName());
     }
 }
