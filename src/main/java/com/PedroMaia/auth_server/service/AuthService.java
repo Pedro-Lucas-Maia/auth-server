@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-    private final UserService userService;
+    private final ProfileService profileService;
     private final LoginService loginService;
     private final CookieService cookieService;
     private final RegisterService registerService;
 
-    public AuthService(UserService userService, LoginService loginService, CookieService cookieService, RegisterService registerService) {
-        this.userService = userService;
+    public AuthService(ProfileService profileService, LoginService loginService, CookieService cookieService, RegisterService registerService) {
+        this.profileService = profileService;
         this.loginService = loginService;
         this.cookieService = cookieService;
         this.registerService = registerService;
@@ -22,7 +22,7 @@ public class AuthService {
 
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
         UserResponseDTO user = loginService.login(loginRequestDTO);
-        return new AuthResponseDTO(user.Id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
+        return new AuthResponseDTO(user.id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
     }
 
     public String getCleanCookie() {
@@ -31,11 +31,11 @@ public class AuthService {
 
     public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO) {
         UserResponseDTO user = registerService.register(registerRequestDTO);
-        return new AuthResponseDTO(user.Id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
+        return new AuthResponseDTO(user.id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
     }
 
-    public AuthResponseDTO me(String email) {
-        UserResponseDTO user = userService.me(email);
-        return new AuthResponseDTO(user.Id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
+    public AuthResponseDTO getProfile(String email) {
+        UserResponseDTO user = profileService.getProfile(email);
+        return new AuthResponseDTO(user.id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
     }
 }

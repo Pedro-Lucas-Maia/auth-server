@@ -12,7 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
 
@@ -25,7 +25,7 @@ public class AuthController {
         AuthResponseDTO authResponseDTO = authService.login(loginRequestDTO);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authResponseDTO.cookie())
-                .body(new UserResponseDTO(authResponseDTO.name(), authResponseDTO.email(), authResponseDTO.role()));
+                .body(new UserResponseDTO(authResponseDTO.id(), authResponseDTO.name(), authResponseDTO.email(), authResponseDTO.role()));
     }
 
     @PostMapping("/logout")
@@ -43,19 +43,6 @@ public class AuthController {
 
         return  ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authResponseDTO.cookie())
-                .body(new UserResponseDTO(authResponseDTO.name(), authResponseDTO.email(), authResponseDTO.role()));
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<UserResponseDTO> me(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).build();
-        }
-        String email = authentication.getName();
-        AuthResponseDTO authResponseDTO = authService.me(email);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, authResponseDTO.cookie())
-                .body(new UserResponseDTO(authResponseDTO.name(), authResponseDTO.email(), authResponseDTO.role()));
+                .body(new UserResponseDTO(authResponseDTO.id(), authResponseDTO.name(), authResponseDTO.email(), authResponseDTO.role()));
     }
 }
