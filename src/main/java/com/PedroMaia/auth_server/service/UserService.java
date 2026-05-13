@@ -1,17 +1,11 @@
 package com.PedroMaia.auth_server.service;
 
 import com.PedroMaia.auth_server.domain.User;
-import com.PedroMaia.auth_server.dto.RegisterRequestDTO;
 import com.PedroMaia.auth_server.dto.UserResponseDTO;
-import com.PedroMaia.auth_server.repository.RoleRepository;
 import com.PedroMaia.auth_server.repository.UserRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.time.LocalDateTime;
 
 @Service
 public class UserService {
