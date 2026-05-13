@@ -9,15 +9,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
     private final UserService userService;
+    private final LoginService loginService;
     private final CookieService cookieService;
 
-    public AuthService(UserService userService, CookieService cookieService) {
+    public AuthService(UserService userService, LoginService loginService, CookieService cookieService) {
         this.userService = userService;
+        this.loginService = loginService;
         this.cookieService = cookieService;
     }
 
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
-        UserResponseDTO user = userService.login(loginRequestDTO);
+        UserResponseDTO user = loginService.login(loginRequestDTO);
         return new AuthResponseDTO(user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
     }
 
