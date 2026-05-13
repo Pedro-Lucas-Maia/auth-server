@@ -1,7 +1,6 @@
 package com.PedroMaia.auth_server.service;
 
 import com.PedroMaia.auth_server.domain.User;
-import com.PedroMaia.auth_server.dto.LoginRequestDTO;
 import com.PedroMaia.auth_server.dto.UserResponseDTO;
 import com.PedroMaia.auth_server.repository.UserRepository;
 import org.springframework.http.HttpStatus;
