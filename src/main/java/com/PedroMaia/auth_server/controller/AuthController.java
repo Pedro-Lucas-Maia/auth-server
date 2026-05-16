@@ -7,6 +7,7 @@ import com.PedroMaia.auth_server.dto.UserResponseDTO;
 import com.PedroMaia.auth_server.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,10 +39,16 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
-        AuthResponseDTO authResponseDTO = authService.register(registerRequestDTO);
+        UserResponseDTO userResponseDTO = authService.register(registerRequestDTO);
 
-        return  ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, authResponseDTO.cookie())
-                .body(new UserResponseDTO(authResponseDTO.id(), authResponseDTO.name(), authResponseDTO.email(), authResponseDTO.role()));
+        return  ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<UserResponseDTO> verify(@RequestParam("token") String token) {
+      AuthResponseDTO authResponseDTO = authService.verifyToken(token);
+      return ResponseEntity.ok()
+              .header(HttpHeaders.SET_COOKIE, authResponseDTO.cookie())
+              .body(new UserResponseDTO(authResponseDTO.id(), authResponseDTO.name(), authResponseDTO.email(), authResponseDTO.role()));
     }
 }

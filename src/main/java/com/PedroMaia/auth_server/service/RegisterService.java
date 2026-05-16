@@ -4,8 +4,10 @@ import com.PedroMaia.auth_server.domain.Role;
 import com.PedroMaia.auth_server.domain.User;
 import com.PedroMaia.auth_server.dto.RegisterRequestDTO;
 import com.PedroMaia.auth_server.dto.UserResponseDTO;
+import com.PedroMaia.auth_server.event.UserRegisteredEvent;
 import com.PedroMaia.auth_server.repository.RoleRepository;
 import com.PedroMaia.auth_server.repository.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,15 @@ public class RegisterService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final AccountVerificationService accountVerificationService;
 
-    public RegisterService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public RegisterService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, ApplicationEventPublisher applicationEventPublisher, AccountVerificationService accountVerificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.accountVerificationService = accountVerificationService;
     }
 
     @Transactional
@@ -33,6 +39,8 @@ public class RegisterService {
         Role role = findRoleOrThrow();
 
         User user = saveUserToDb(registerRequestDTO, role);
+
+        publishRegisterEvent(user);
 
         return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRoleName());
     }
@@ -56,11 +64,30 @@ public class RegisterService {
         newUser.setPassword(encodedPassword);
         newUser.setRoleId(role.getId());
         newUser.setLocked(false);
-        newUser.setEnabled(true);
+        newUser.setEnabled(false);
         newUser.setCreatedAt(LocalDateTime.now());
         newUser.setUpdatedAt(LocalDateTime.now());
-        newUser.setLastLoginAt(LocalDateTime.now()); // Set lastLoginAt at the register, because register returns a token, smooth register -> login flow
         userRepository.save(newUser);
         return newUser;
+    }
+
+    private void publishRegisterEvent(User user) {
+        String token = accountVerificationService.createVerificationToken(user);
+
+        UserRegisteredEvent event = new UserRegisteredEvent(user, token);
+
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Transactional
+    public UserResponseDTO verifyToken(String token) {
+        var userId = accountVerificationService.verifyToken(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User not found after token verification"));
+
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRoleName());
     }
 }

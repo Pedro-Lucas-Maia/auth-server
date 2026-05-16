@@ -31,6 +31,10 @@ public class LoginService {
 
         verifyAccountIsNotLocked(user, LocalDateTime.now());
 
+        if(!user.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account is not verified");
+        }
+
         if (!isPasswordValid(user, loginRequestDTO.password())) {
             handleFailedAttempt(user);
         }
@@ -55,6 +59,7 @@ public class LoginService {
             }
         }
     }
+
     private boolean isPasswordValid(User user, String requestPassword) {
         String dbPassword = user.getPassword();
         return passwordEncoder.matches(requestPassword, dbPassword);

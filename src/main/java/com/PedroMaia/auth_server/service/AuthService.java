@@ -29,13 +29,17 @@ public class AuthService {
         return cookieService.getCleanCookie();
     }
 
-    public AuthResponseDTO register(RegisterRequestDTO registerRequestDTO) {
-        UserResponseDTO user = registerService.register(registerRequestDTO);
-        return new AuthResponseDTO(user.id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
+    public UserResponseDTO register(RegisterRequestDTO registerRequestDTO) {
+       return registerService.register(registerRequestDTO);
     }
 
     public AuthResponseDTO getProfile(String email) {
         UserResponseDTO user = profileService.getProfile(email);
         return new AuthResponseDTO(user.id(), user.name(), user.email(), user.role(), cookieService.generateTokenCookie(user.email()));
+    }
+
+    public AuthResponseDTO verifyToken(String token) {
+        UserResponseDTO userResponseDTO = registerService.verifyToken(token);
+        return new AuthResponseDTO(userResponseDTO.id(), userResponseDTO.name(), userResponseDTO.email(), userResponseDTO.role(), cookieService.generateTokenCookie(userResponseDTO.email()));
     }
 }
