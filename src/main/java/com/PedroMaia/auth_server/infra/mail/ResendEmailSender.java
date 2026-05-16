@@ -30,7 +30,7 @@ public class ResendEmailSender implements EmailSender {
                 .build();
         try {
             CreateEmailResponse data = resend.emails().send(params);
-            log.info("Resend email sent to: {}", to);
+            log.info("Resend email sent to: {}, with {}", to, data);
         } catch (Exception e) {
             log.error("Failed to send email to: {}", to, e);
         }
