@@ -23,7 +23,7 @@ public class ResendEmailSender implements EmailSender {
         Resend resend = new Resend(apiKey);
 
         CreateEmailOptions params = CreateEmailOptions.builder()
-                .from("Acme <onboarding@resend.dev")
+                .from("Acme <onboarding@resend.dev>")
                 .to(to)
                 .subject(subject)
                 .html(content)

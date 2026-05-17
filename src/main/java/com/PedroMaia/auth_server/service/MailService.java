@@ -19,7 +19,7 @@ public class MailService {
                 <h1> Welcome, %s!</h1>
                 <p>Please click the link below to verify your account:</p>
                 <a href="%s">Verify Account</a>
-                """.formatted(user.getEmail(), verifyLink);
+                """.formatted(user.getName(), verifyLink);
 
         emailSender.sendEmail(user.getEmail(), subject, content);
     }
@@ -31,7 +31,7 @@ public class MailService {
                 <h1> Hello, %s!</h1>
                 <p>Please click the link below to reset your password:</p>
                 <a href="%s">Reset Password</a>
-                """.formatted(user.getEmail(), resetLink);
+                """.formatted(user.getName(), resetLink);
 
         emailSender.sendEmail(user.getEmail(), subject, content);
     }

@@ -20,7 +20,6 @@ public class User {
     private UUID roleId;
 
     @ReadOnlyProperty
-    @Column("role_name")
     private String roleName;
 
     private boolean locked;
