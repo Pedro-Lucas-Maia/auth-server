@@ -1,14 +1,14 @@
 package com.PedroMaia.auth_server.service;
 
 import com.PedroMaia.auth_server.domain.User;
-import com.PedroMaia.auth_server.infra.mail.ResendEmailSender;
+import com.PedroMaia.auth_server.infra.mail.EmailSender;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MailService {
-    private final ResendEmailSender emailSender;
+    private final EmailSender emailSender;
 
-    public MailService(ResendEmailSender emailSender) {
+    public MailService(EmailSender emailSender) {
         this.emailSender = emailSender;
     }
 
@@ -25,7 +25,7 @@ public class MailService {
     }
 
     public void sendResetPasswordEmail(User user, String token) {
-        String resetLink = "http://localhost:8080/api/auth/reset?token=" + token;
+        String resetLink = "http://localhost:8080/api/auth/password-reset/validate?token=" + token;
         String subject = "Reset your password";
         String content = """
                 <h1> Hello, %s!</h1>

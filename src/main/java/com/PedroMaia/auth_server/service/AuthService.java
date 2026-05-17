@@ -12,12 +12,14 @@ public class AuthService {
     private final LoginService loginService;
     private final CookieService cookieService;
     private final RegisterService registerService;
+    private final PasswordResetService passwordResetService;
 
-    public AuthService(ProfileService profileService, LoginService loginService, CookieService cookieService, RegisterService registerService) {
+    public AuthService(ProfileService profileService, LoginService loginService, CookieService cookieService, RegisterService registerService, PasswordResetService passwordResetService) {
         this.profileService = profileService;
         this.loginService = loginService;
         this.cookieService = cookieService;
         this.registerService = registerService;
+        this.passwordResetService = passwordResetService;
     }
 
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -41,5 +43,17 @@ public class AuthService {
     public AuthResponseDTO verifyToken(String token) {
         UserResponseDTO userResponseDTO = registerService.verifyToken(token);
         return new AuthResponseDTO(userResponseDTO.id(), userResponseDTO.name(), userResponseDTO.email(), userResponseDTO.role(), cookieService.generateTokenCookie(userResponseDTO.email()));
+    }
+
+    public void initiatePasswordReset(String email) {
+        passwordResetService.initiatePasswordReset(email);
+    }
+
+    public void validatePasswordResetToken(String token) {
+        passwordResetService.verifyToken(token);
+    }
+
+    public void confirmPasswordReset(String token, String newPassword) {
+        passwordResetService.confirmPasswordReset(token, newPassword);
     }
 }

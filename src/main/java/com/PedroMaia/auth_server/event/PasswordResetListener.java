@@ -7,16 +7,16 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
-public class UserRegistrationListener {
+public class PasswordResetListener {
     private final MailService mailService;
 
-    public UserRegistrationListener(MailService mailService) {
+    public PasswordResetListener(MailService mailService) {
         this.mailService = mailService;
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
-    public void handleUserRegistration(OnUserRegisterEvent event) {
-        mailService.sendVerificationEmail(event.user(), event.token());
+    public void handlePasswordReset(OnPasswordResetEvent event) {
+        mailService.sendResetPasswordEmail(event.user(), event.token());
     }
 }

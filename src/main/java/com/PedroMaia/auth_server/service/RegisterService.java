@@ -4,7 +4,7 @@ import com.PedroMaia.auth_server.domain.Role;
 import com.PedroMaia.auth_server.domain.User;
 import com.PedroMaia.auth_server.dto.RegisterRequestDTO;
 import com.PedroMaia.auth_server.dto.UserResponseDTO;
-import com.PedroMaia.auth_server.event.UserRegisteredEvent;
+import com.PedroMaia.auth_server.event.OnUserRegisterEvent;
 import com.PedroMaia.auth_server.repository.RoleRepository;
 import com.PedroMaia.auth_server.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -74,7 +74,7 @@ public class RegisterService {
     private void publishRegisterEvent(User user) {
         String token = accountVerificationService.createVerificationToken(user);
 
-        UserRegisteredEvent event = new UserRegisteredEvent(user, token);
+        OnUserRegisterEvent event = new OnUserRegisterEvent(user, token);
 
         applicationEventPublisher.publishEvent(event);
     }
