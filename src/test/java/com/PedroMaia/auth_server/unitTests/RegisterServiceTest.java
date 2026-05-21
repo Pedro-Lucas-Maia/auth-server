@@ -44,12 +44,12 @@ public class RegisterServiceTest {
     @InjectMocks
     private RegisterService registerService;
 
-    private RegisterRequestDTO registerRequestDTO;
-
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
+    private RegisterRequestDTO registerRequestDTO;
 
     @BeforeEach
     public void getRegisterRequestDTO() {
