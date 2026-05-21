@@ -78,7 +78,7 @@ public class LoginService {
     private UserResponseDTO handleSuccessfulLogin(User user) {
         user.setFailedLoginAttempts(0);
         user.setLastLoginAt(LocalDateTime.now());
-        userRepository.save(user);
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRoleName());
+        User savedUser = userRepository.save(user);
+        return new UserResponseDTO(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.getRoleName());
     }
 }

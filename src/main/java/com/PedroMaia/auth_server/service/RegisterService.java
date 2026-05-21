@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class RegisterService {
@@ -67,8 +68,7 @@ public class RegisterService {
         newUser.setEnabled(false);
         newUser.setCreatedAt(LocalDateTime.now());
         newUser.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(newUser);
-        return newUser;
+        return userRepository.save(newUser);
     }
 
     private void publishRegisterEvent(User user) {
@@ -81,13 +81,13 @@ public class RegisterService {
 
     @Transactional
     public UserResponseDTO verifyToken(String token) {
-        var userId = accountVerificationService.verifyToken(token);
+        UUID userId = accountVerificationService.verifyToken(token);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User not found after token verification"));
 
         user.setEnabled(true);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRoleName());
+        return new UserResponseDTO(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.getRoleName());
     }
 }
