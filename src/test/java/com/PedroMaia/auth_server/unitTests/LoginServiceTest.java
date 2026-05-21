@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,19 +39,29 @@ public class LoginServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    private LoginRequestDTO loginRequestDTO;
+
+    @BeforeEach
+    public void getLoginRequestDTO() {
+        this.loginRequestDTO = new LoginRequestDTO("joaozinho@gmail.com", "12345678");
+    }
+
     @Test
     @DisplayName("Should successfully login with valid credentials")
-    public void testValidLogin() throws ResponseStatusException {
-        LoginRequestDTO loginRequestDTO = new LoginRequestDTO("joaozinho@gmail.com", "12345678");
+    public void testValidLogin() {
         User  user = createDefaultUser();
 
         when(userRepository.findByEmail("joaozinho@gmail.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(any(), eq("12345678"))).thenReturn(true);
+        when(userRepository.save(user)).thenReturn(user);
 
         UserResponseDTO userResponseDTO = loginService.login(loginRequestDTO);
 
         verify(userRepository, times(1)).findByEmail(loginRequestDTO.email());
         verify(passwordEncoder, times(1)).matches(any(), eq(loginRequestDTO.password()));
+        verify(userRepository, times(1)).save(user);
+        Assertions.assertEquals(0, user.getFailedLoginAttempts());
+        Assertions.assertNotNull(user.getLastLoginAt());
         Assertions.assertEquals(userResponseDTO.email(), (user.getEmail()));
         Assertions.assertEquals(userResponseDTO.name(), (user.getName()));
         Assertions.assertEquals(userResponseDTO.role(), (user.getRoleName()));
@@ -59,17 +70,16 @@ public class LoginServiceTest {
     @Test
     @DisplayName("Should throw if user don't exist in the database")
     public void testUserNotFound() throws ResponseStatusException {
-        LoginRequestDTO loginRequestDTO = new LoginRequestDTO("joaozinho@gmail.com", "12345678");
-
         when(userRepository.findByEmail(loginRequestDTO.email())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResponseStatusException.class, () -> loginService.login(loginRequestDTO));
+
+        verify(userRepository, times(1)).findByEmail(loginRequestDTO.email());
     }
 
     @Test
     @DisplayName("Should throw if password is invalid")
     public void testInvalidPassword() throws ResponseStatusException {
-        LoginRequestDTO loginRequestDTO = new LoginRequestDTO("joaozinho@gmail.com", "12345678");
         User  user = createDefaultUser();
 
         when(userRepository.findByEmail(loginRequestDTO.email())).thenReturn(Optional.of(user));
@@ -81,7 +91,6 @@ public class LoginServiceTest {
     @Test
     @DisplayName("Should throw if account is not verified")
     public void testAccountNotVerified() throws ResponseStatusException {
-        LoginRequestDTO loginRequestDTO = new LoginRequestDTO("joaozinho@gmail.com", "12345678");
         User user = createDefaultUser();
         user.setEnabled(false);
 
@@ -94,7 +103,6 @@ public class LoginServiceTest {
     @Test
     @DisplayName("Should throw if account is locked")
     public void testAccountLocked() throws ResponseStatusException {
-        LoginRequestDTO loginRequestDTO = new LoginRequestDTO("joaozinho@gmail.com", "12345678");
         User user = createDefaultUser();
         user.setLocked(true);
 
@@ -107,7 +115,6 @@ public class LoginServiceTest {
     @Test
     @DisplayName("Should lock account after 5 failed login attempts")
     public void testAccountLockAfterFailedAttempts() throws ResponseStatusException {
-        LoginRequestDTO loginRequestDTO = new LoginRequestDTO("joaozinho@gmail.com", "12345678");
         User user = createDefaultUser();
         user.setFailedLoginAttempts(4);
 
@@ -115,7 +122,31 @@ public class LoginServiceTest {
         when(passwordEncoder.matches(any(), eq("12345678"))).thenReturn(false);
 
         Assertions.assertThrows(ResponseStatusException.class, () -> loginService.login(loginRequestDTO));
+        Assertions.assertTrue(user.isLocked(), "User should be locked after 5 failed attempts");
+        Assertions.assertEquals(5, user.getFailedLoginAttempts());
+        Assertions.assertNotNull(user.getLockoutMoment());
+        verify(userRepository, times(1)).save(user);
     }
+
+    @Test
+    @DisplayName("Should unlock account and login successfully if lockout time has expired")
+    public void testLockoutExpired() {
+        User user = createDefaultUser();
+        user.setLocked(true);
+        user.setLockoutMoment(LocalDateTime.now().minusMinutes(20));
+
+        when(userRepository.findByEmail(loginRequestDTO.email())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        loginService.login(loginRequestDTO);
+
+        Assertions.assertFalse(user.isLocked());
+        Assertions.assertNull(user.getLockoutMoment());
+
+        verify(userRepository, times(2)).save(user);
+    }
+
 
     private User createDefaultUser() {
         User user = new User();
